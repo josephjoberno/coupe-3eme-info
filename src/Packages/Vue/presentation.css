@@ -1,0 +1,20 @@
+table {
+    width: 60%;
+    height: 120px;
+}
+
+table th {
+    background-color: rgb(124, 158, 116);
+}
+
+table td {
+    background: rgba(255, 254, 254, 0.637);
+    text-align: center;
+
+}
+p{
+    color:#1077dd;
+}
+
+
+
