@@ -122,7 +122,7 @@ $bdd->query($sqlClA);
 
 
 // selection a la base pour le classement du groupe A
-$resultCA2 = $bdd->query("SELECT * FROM ClassementA LIMIT 2,2");
+$resultCA2 = $bdd->query("SELECT * FROM ClassementA LIMIT 2,2")->fetchAll();
 $resultCA1 = $bdd->query("SELECT * FROM ClassementA LIMIT 2")->fetchAll();
 
 function verifyMatch($equipe1, $equipe2)
@@ -134,30 +134,66 @@ function verifyMatch($equipe1, $equipe2)
     if ($myResult = $result->fetchObject()) { //verification si il y a un match
         return $myResult->EGagner; //retour de l'id de l'equipe gagnante
     }
-    return null;//sinon il retourne null
+    return null; //sinon il retourne null
 }
 
 
 
-// echo "avant la permutation";
-// var_log($resultCA1[0]);
-// var_log($resultCA1[1]);
-
-
+// Verification pour les deux premiers du classement (1er et 2eme)
 if ($resultCA1[0]['point'] == $resultCA1[1]['point']) {
     $bdd = loadDb();
     $equipeGagner = verifyMatch($resultCA1[0]['id'], $resultCA1[1]['id']);
-    var_log($equipeGagner);
     if ($equipeGagner == $resultCA1[1]['id']) { //verification si l'equipe gagnante est deuxieme
         $temp = $resultCA1[0];
         $resultCA1[0] = $resultCA1[1];
         $resultCA1[1] = $temp;
-        /* echo "apres la permutation";
-        var_log($resultCA1[0]);
-        var_log($resultCA1[1]);*/
+    }
+    // Verification en cas d'egalite de score
+    if ($equipeGagner == 0) {
+        if ($resultCA1[1]['butPour'] > $resultCA1[0]['butPour']) { //verification si l'equipe gagnante est deuxieme
+            $temp = $resultCA1[0];
+            $resultCA1[0] = $resultCA1[1];
+            $resultCA1[1] = $temp;
+        }
+
+         // Verification si les butPour des deux premiers equipes (1er et 2eme) sont egaux
+         if ($resultCA1[1]['butPour'] == $resultCA1[0]['butPour']) {
+            if ($resultCA1[1]['butContre'] < $resultCA1[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
+                $temp = $resultCA1[0];
+                $resultCA1[0] = $resultCA1[1];
+                $resultCA1[1] = $temp;
+            }
+        }
     }
 }
 
+//Verification pour les deux derniers du classement (3eme et 4eme)
+
+if ($resultCA2[0]['point'] == $resultCA2[1]['point']) {
+    $bdd = loadDb();
+    $equipeGagner = verifyMatch($resultCA2[0]['id'], $resultCA2[1]['id']);
+    if ($equipeGagner == $resultCA2[1]['id']) { //verification si l'equipe gagnante est quatrieme
+        $temp = $resultCA2[0];
+        $resultCA2[0] = $resultCA2[1];
+        $resultCA2[1] = $temp;
+    }
+
+    if ($equipeGagner == 0) {
+        if ($resultCA2[1]['butPour'] > $resultCA2[0]['butPour']) { //verification si l'equipe gagnante est quatrieme
+            $temp = $resultCA2[0];
+            $resultCA2[0] = $resultCA2[1];
+            $resultCA2[1] = $temp;
+        }
+         // Verification si les butPour des deux premiers equipes (1er et 2eme) sont egaux
+         if ($resultCA2[1]['butPour'] == $resultCA2[0]['butPour']) {
+            if ($resultCA2[1]['butContre'] < $resultCA2[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
+                $temp = $resultCA2[0];
+                $resultCA2[0] = $resultCA2[1];
+                $resultCA2[1] = $temp;
+            }
+        }
+    }
+}
 
 
 
@@ -175,6 +211,68 @@ SELECT * FROM ClassementB ";
 $resultCB = $bdd->query($sqlClassementB);
 
 
+//selection a la base pour le classement du groupe B
+$resultCB2 = $bdd->query("SELECT * FROM ClassementB LIMIT 2,2")->fetchAll();
+$resultCB1 = $bdd->query("SELECT * FROM ClassementB LIMIT 2")->fetchAll();
+
+
+
+// Verification pour les deux premiers du classement B (1er et 2eme)
+if ($resultCB1[0]['point'] == $resultCB1[1]['point']) {
+    $bdd = loadDb();
+    $equipeGagner = verifyMatch($resultCB1[0]['id'], $resultCB1[1]['id']);
+    if ($equipeGagner == $resultCB1[1]['id']) { //verification si l'equipe gagnante est deuxieme
+        $temp = $resultCB1[0];
+        $resultCB1[0] = $resultCB1[1];
+        $resultCB1[1] = $temp;
+    }
+    // Verification en cas d'egalite de score
+    if ($equipeGagner == 0) {
+        if ($resultCB1[1]['butPour'] > $resultCB1[0]['butPour']) { //verification si l'equipe gagnante est deuxieme
+            $temp = $resultCB1[0];
+            $resultCB1[0] = $resultCB1[1];
+            $resultCB1[1] = $temp;
+        }
+
+        // Verification si les butPour des deux premiers equipes (1er et 2eme) sont egaux
+        if ($resultCB1[1]['butPour'] == $resultCB1[0]['butPour']) {
+            if ($resultCB1[1]['butContre'] < $resultCB1[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
+                $temp = $resultCB1[0];
+                $resultCB1[0] = $resultCB1[1];
+                $resultCB1[1] = $temp;
+            }
+        }
+    }
+}
+
+//Verification pour les deux derniers du classement (3eme et 4eme)
+
+if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
+    $bdd = loadDb();
+    $equipeGagner = verifyMatch($resultCB2[0]['id'], $resultCB2[1]['id']);
+    if ($equipeGagner == $resultCB2[1]['id']) { //verification si l'equipe gagnante est quatrieme
+        $temp = $resultCB2[0];
+        $resultCB2[0] = $resultCB2[1];
+        $resultCB2[1] = $temp;
+    }
+
+    if ($equipeGagner == 0) {
+        if ($resultCB2[1]['butPour'] > $resultCB2[0]['butPour']) { //verification si l'equipe gagnante est quatrieme
+            $temp = $resultCB2[0];
+            $resultCB2[0] = $resultCB2[1];
+            $resultCB2[1] = $temp;
+        }
+
+        // Verification si les butPour des deux derniers equipes (3eme et 4eme) sont egaux
+        if ($resultCB2[1]['butPour'] == $resultCB2[0]['butPour']) {
+            if ($resultCB2[1]['butContre'] < $resultCB2[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
+                $temp = $resultCB2[0];
+                $resultCB2[0] = $resultCB2[1];
+                $resultCB2[1] = $temp;
+            }
+        }
+    }
+}
 
 
 
@@ -476,47 +574,38 @@ $resultCB = $bdd->query($sqlClassementB);
                     <td>Point</td>
                 </tr>
 
-                <tr>
-                    <td><?= $resultCA1[0]['nomEquipe'] ?>
-                    <td><?= $resultCA1[0]['matchJouer'] ?>
-                    <td><?= $resultCA1[0]['matchGagner'] ?>
-                    <td><?= $resultCA1[0]['matchNull'] ?>
-                    <td><?= $resultCA1[0]['matchPerdu'] ?>
-                    <td><?= $resultCA1[0]['butPour'] ?>
-                    <td><?= $resultCA1[0]['butContre'] ?>
-                    <td><?= $resultCA1[0]['difference'] ?>
-                    <td><?= $resultCA1[0]['point'] ?>
-                    <td>
-                </tr>
-
-
-                <tr>
-                    <td><?= $resultCA1[1]['nomEquipe'] ?>
-                    <td><?= $resultCA1[1]['matchJouer'] ?>
-                    <td><?= $resultCA1[1]['matchGagner'] ?>
-                    <td><?= $resultCA1[1]['matchNull'] ?>
-                    <td><?= $resultCA1[1]['matchPerdu'] ?>
-                    <td><?= $resultCA1[1]['butPour'] ?>
-                    <td><?= $resultCA1[1]['butContre'] ?>
-                    <td><?= $resultCA1[1]['difference'] ?>
-                    <td><?= $resultCA1[1]['point'] ?>
-                    <td>
-                </tr>
-
-                <?php while ($clResult = $resultCA2->fetch(PDO::FETCH_OBJ)) : ?>
+                <?php for ($i = 0; $i < 2; $i++) : ?>
                     <tr>
-                        <td><?= $clResult->nomEquipe ?>
-                        <td><?= $clResult->matchJouer ?>
-                        <td><?= $clResult->matchGagner ?>
-                        <td><?= $clResult->matchNull ?>
-                        <td><?= $clResult->matchPerdu ?>
-                        <td><?= $clResult->butPour ?>
-                        <td><?= $clResult->butContre ?>
-                        <td><?= $clResult->difference ?>
-                        <td><?= $clResult->point ?>
+                        <td><?= $resultCA1[$i]['nomEquipe'] ?>
+                        <td><?= $resultCA1[$i]['matchJouer'] ?>
+                        <td><?= $resultCA1[$i]['matchGagner'] ?>
+                        <td><?= $resultCA1[$i]['matchNull'] ?>
+                        <td><?= $resultCA1[$i]['matchPerdu'] ?>
+                        <td><?= $resultCA1[$i]['butPour'] ?>
+                        <td><?= $resultCA1[$i]['butContre'] ?>
+                        <td><?= $resultCA1[$i]['difference'] ?>
+                        <td><?= $resultCA1[$i]['point'] ?>
                         <td>
                     </tr>
-                <?php endwhile; ?>
+
+                <?php endfor; ?>
+
+
+
+                <?php for ($i = 0; $i < 2; $i++) : ?>
+                    <tr>
+                        <td><?= $resultCA2[$i]['nomEquipe'] ?>
+                        <td><?= $resultCA2[$i]['matchJouer'] ?>
+                        <td><?= $resultCA2[$i]['matchGagner'] ?>
+                        <td><?= $resultCA2[$i]['matchNull'] ?>
+                        <td><?= $resultCA2[$i]['matchPerdu'] ?>
+                        <td><?= $resultCA2[$i]['butPour'] ?>
+                        <td><?= $resultCA2[$i]['butContre'] ?>
+                        <td><?= $resultCA2[$i]['difference'] ?>
+                        <td><?= $resultCA2[$i]['point'] ?>
+                        <td>
+                    </tr>
+                <?php endfor; ?>
             </table>
 
             <!-- Classement Groupe B -->
@@ -534,27 +623,43 @@ $resultCB = $bdd->query($sqlClassementB);
                         <td>MJ</td>
                         <td>MG</td>
                         <td>MN</td>
-                        <td>MP<MP /td>
+                        <td>MP</td>
                         <td>BP</td>
                         <td>BC</td>
                         <td>Dif</td>
                         <td>Point</td>
                     </tr>
 
-                    <?php while ($clResult = $resultCA2->fetch(PDO::FETCH_OBJ)) : ?>
+                    <?php for ($i = 0; $i < 2; $i++) : ?>
                         <tr>
-                            <td><?= $clResult->nomEquipe ?>
-                            <td><?= $clResult->matchJouer ?>
-                            <td><?= $clResult->matchGagner ?>
-                            <td><?= $clResult->matchNull ?>
-                            <td><?= $clResult->matchPerdu ?>
-                            <td><?= $clResult->butPour ?>
-                            <td><?= $clResult->butContre ?>
-                            <td><?= $clResult->difference ?>
-                            <td><?= $clResult->point ?>
+                            <td><?= $resultCB1[$i]['nomEquipe'] ?>
+                            <td><?= $resultCB1[$i]['matchJouer'] ?>
+                            <td><?= $resultCB1[$i]['matchGagner'] ?>
+                            <td><?= $resultCB1[$i]['matchNull'] ?>
+                            <td><?= $resultCB1[$i]['matchPerdu'] ?>
+                            <td><?= $resultCB1[$i]['butPour'] ?>
+                            <td><?= $resultCB1[$i]['butContre'] ?>
+                            <td><?= $resultCB1[$i]['difference'] ?>
+                            <td><?= $resultCB1[$i]['point'] ?>
                             <td>
                         </tr>
-                    <?php endwhile; ?>
+
+                    <?php endfor; ?>
+
+                    <?php for ($i = 0; $i < 2; $i++) : ?>
+                        <tr>
+                            <td><?= $resultCB2[$i]['nomEquipe'] ?>
+                            <td><?= $resultCB2[$i]['matchJouer'] ?>
+                            <td><?= $resultCB2[$i]['matchGagner'] ?>
+                            <td><?= $resultCB2[$i]['matchNull'] ?>
+                            <td><?= $resultCB2[$i]['matchPerdu'] ?>
+                            <td><?= $resultCB2[$i]['butPour'] ?>
+                            <td><?= $resultCB2[$i]['butContre'] ?>
+                            <td><?= $resultCB2[$i]['difference'] ?>
+                            <td><?= $resultCB2[$i]['point'] ?>
+                            <td>
+                        </tr>
+                    <?php endfor; ?>
 
 
                 </table>

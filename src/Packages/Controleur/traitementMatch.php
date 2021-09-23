@@ -213,6 +213,7 @@ function compareScore($nomEquipe1, $nomEquipe2, $score1, $score2, $match)
         WHERE nomEquipe='$nomEquipe1'";
 
         $bdd->query($sql2);
+        addMatch($myResultE1->id, $myResultE2->id, 0, $match);
     }
 
 
