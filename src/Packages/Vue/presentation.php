@@ -122,46 +122,39 @@ $bdd->query($sqlClA);
 
 
 // selection a la base pour le classement du groupe A
-$sqlClassementA2 = "
-SELECT * FROM ClassementA LIMIT 2,2";
-$sqlClassementA1 = "
-SELECT * FROM ClassementA LIMIT 0,2";
-$resultCA1 = $bdd->query($sqlClassementA1);
-
-
-$resultCA2 = $bdd->query($sqlClassementA2);
-$resultTest = $bdd->query("SELECT * FROM ClassementA LIMIT 2")->fetchAll();
+$resultCA2 = $bdd->query("SELECT * FROM ClassementA LIMIT 2,2");
+$resultCA1 = $bdd->query("SELECT * FROM ClassementA LIMIT 2")->fetchAll();
 
 function verifyMatch($equipe1, $equipe2)
 {
 
     $bdd = loadDb();
-    $sqlEG = "
-    SELECT EGagner from matchE where equipe1='$equipe1' AND equipe2='$equipe2'
-    ";
+    $sqlEG = "SELECT EGagner from matchE where equipe1='$equipe1' AND equipe2='$equipe2'";
     $result = $bdd->query($sqlEG);
-    $myResult = $result->fetchObject();
-    return $myResult->EGagner;
+    if ($myResult = $result->fetchObject()) { //verification si il y a un match
+        return $myResult->EGagner; //retour de l'id de l'equipe gagnante
+    }
+    return null;//sinon il retourne null
 }
 
 
-$equipeTab1=
-[
-    "nomEquipe"=>$resultTest[0]['nomEquipe'],
-    "matchJouer"=>$resultTest[0]['matchJouer']
-];
-$equipeTab2=
-[
-    "nomEquipe"=>$resultTest[1]['nomEquipe'],
-    "matchJouer"=>$resultTest[1]['matchJouer']
-];
-if ($resultTest[0]['point'] == $resultTest[1]['point']) {
+
+// echo "avant la permutation";
+// var_log($resultCA1[0]);
+// var_log($resultCA1[1]);
+
+
+if ($resultCA1[0]['point'] == $resultCA1[1]['point']) {
     $bdd = loadDb();
-    $equipeGagner = verifyMatch($resultTest[0]['id'], $resultTest[1]['id']);
+    $equipeGagner = verifyMatch($resultCA1[0]['id'], $resultCA1[1]['id']);
     var_log($equipeGagner);
-    if ($equipeGagner == $resultTest[1]['id']) {
-
-
+    if ($equipeGagner == $resultCA1[1]['id']) { //verification si l'equipe gagnante est deuxieme
+        $temp = $resultCA1[0];
+        $resultCA1[0] = $resultCA1[1];
+        $resultCA1[1] = $temp;
+        /* echo "apres la permutation";
+        var_log($resultCA1[0]);
+        var_log($resultCA1[1]);*/
     }
 }
 
@@ -483,20 +476,32 @@ $resultCB = $bdd->query($sqlClassementB);
                     <td>Point</td>
                 </tr>
 
-                <?php while ($clResult = $resultCA1->fetch(PDO::FETCH_OBJ)) : ?>
-                    <tr>
-                        <td><?= $clResult->nomEquipe ?>
-                        <td><?= $clResult->matchJouer ?>
-                        <td><?= $clResult->matchGagner ?>
-                        <td><?= $clResult->matchNull ?>
-                        <td><?= $clResult->matchPerdu ?>
-                        <td><?= $clResult->butPour ?>
-                        <td><?= $clResult->butContre ?>
-                        <td><?= $clResult->difference ?>
-                        <td><?= $clResult->point ?>
-                        <td>
-                    </tr>
-                <?php endwhile; ?>
+                <tr>
+                    <td><?= $resultCA1[0]['nomEquipe'] ?>
+                    <td><?= $resultCA1[0]['matchJouer'] ?>
+                    <td><?= $resultCA1[0]['matchGagner'] ?>
+                    <td><?= $resultCA1[0]['matchNull'] ?>
+                    <td><?= $resultCA1[0]['matchPerdu'] ?>
+                    <td><?= $resultCA1[0]['butPour'] ?>
+                    <td><?= $resultCA1[0]['butContre'] ?>
+                    <td><?= $resultCA1[0]['difference'] ?>
+                    <td><?= $resultCA1[0]['point'] ?>
+                    <td>
+                </tr>
+
+
+                <tr>
+                    <td><?= $resultCA1[1]['nomEquipe'] ?>
+                    <td><?= $resultCA1[1]['matchJouer'] ?>
+                    <td><?= $resultCA1[1]['matchGagner'] ?>
+                    <td><?= $resultCA1[1]['matchNull'] ?>
+                    <td><?= $resultCA1[1]['matchPerdu'] ?>
+                    <td><?= $resultCA1[1]['butPour'] ?>
+                    <td><?= $resultCA1[1]['butContre'] ?>
+                    <td><?= $resultCA1[1]['difference'] ?>
+                    <td><?= $resultCA1[1]['point'] ?>
+                    <td>
+                </tr>
 
                 <?php while ($clResult = $resultCA2->fetch(PDO::FETCH_OBJ)) : ?>
                     <tr>
@@ -536,7 +541,7 @@ $resultCB = $bdd->query($sqlClassementB);
                         <td>Point</td>
                     </tr>
 
-                    <?php while ($clResult = $resultCB->fetch(PDO::FETCH_OBJ)) : ?>
+                    <?php while ($clResult = $resultCA2->fetch(PDO::FETCH_OBJ)) : ?>
                         <tr>
                             <td><?= $clResult->nomEquipe ?>
                             <td><?= $clResult->matchJouer ?>
