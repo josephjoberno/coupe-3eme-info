@@ -1,284 +1,7 @@
 <?php
-session_start();
-//creation des sessions pour les matchs
-
-
-
-// require section
-require '../../log.php';
-require_once '../../connectionDatabase.php';
-
-
-
-// variable de connection a la base de donnee
-$bdd = loadDb();
-
-
-//creation des equipes par lot dans un array associative
-$_SESSION['equipe'] = [
-    "lot1" => ['Argentine', 'Bresil'],
-    "lot2" => ['France', 'Italie'],
-    "lot3" => ['Espagne', 'Allemagne'],
-    "lot4" => ['Portugal', 'Haiti']
-];
-
-
-//random pour la gestion de la premeere tete de serie
-$indicePremierA = rand(0, 1);
-$indicePremierB = rand(0, 1);
-while ($indicePremierA == $indicePremierB) {
-    $indicePremierB = rand(0, 1);
-}
-//random pour la gestion de la deuxieme tete de serie
-$indiceDeuxiemeA = rand(0, 1);
-$indiceDeuxiemeB = rand(0, 1);
-while ($indiceDeuxiemeA == $indiceDeuxiemeB) {
-    $indiceDeuxiemeB = rand(0, 1);
-}
-//random pour la gestion de la troisieme tete de serie
-$indiceTroisiemeA = rand(0, 1);
-$indiceTroisiemeB = rand(0, 1);
-while ($indiceTroisiemeA == $indiceTroisiemeB) {
-    $indiceTroisiemeB = rand(0, 1);
-}
-//random pour la gestion de la quat tete de serie
-$indiceQuatriemeA = rand(0, 1);
-$indiceQuatriemeB = rand(0, 1);
-while ($indiceQuatriemeA == $indiceQuatriemeB) {
-    $indiceQuatriemeB = rand(0, 1);
-}
-
-// les equipes apres le tirage
-
-//==============>Groupe A<===================
-$teteDeSerieA1 = $_SESSION['equipe']["lot1"][$indicePremierA];
-$teteDeSerieA2 = $_SESSION['equipe']["lot2"][$indiceDeuxiemeA];
-$teteDeSerieA3 = $_SESSION['equipe']["lot3"][$indiceTroisiemeA];
-$teteDeSerieA4 = $_SESSION['equipe']["lot4"][$indiceQuatriemeA];
-
-//==============>Groupe B<===================
-$teteDeSerieB1 = $_SESSION['equipe']["lot1"][$indicePremierB];
-$teteDeSerieB2 = $_SESSION['equipe']["lot2"][$indiceDeuxiemeB];
-$teteDeSerieB3 = $_SESSION['equipe']["lot3"][$indiceTroisiemeB];
-$teteDeSerieB4 = $_SESSION['equipe']["lot4"][$indiceQuatriemeB];
-
-//selection a la base pour le groupe A
-
-$sqlQ1 = 'SELECT * FROM GroupeA WHERE id=(SELECT max(id) FROM GroupeA)';
-$result1 = $bdd->query($sqlQ1);
-$myResult1 = $result1->fetch(PDO::FETCH_OBJ);
-
-//selection a la base pour le groupe B
-$sqlQ2 = 'SELECT * FROM GroupeB WHERE id=(SELECT max(id) FROM GroupeB)';
-$result2 = $bdd->query($sqlQ2);
-$myResult2 = $result2->fetch(PDO::FETCH_OBJ);
-
-
-// ajout des equipes a la base de donnees
-if (isset($_POST['tirage'])) {
-    // reinitialisation des sessions
-    session_destroy();
-
-    //supression des anciennes tirages
-    $bdd->query('DELETE FROM GROUPEA');
-    $bdd->query('DELETE FROM GROUPEB');
-
-
-
-    //reinitialisation a la table equipe
-    $sqlUpdateEquipe = "
-    update equipe set matchJouer=0,
-    matchGagner=0,matchPerdu=0,
-    matchNull=0,butPour=0,butContre=0,
-    difference=0,point=0;
-    ";
-    $bdd->query($sqlUpdateEquipe);
-
-    //reinitialisation a la table match
-    $sqlUpdateMatch = " 
-    UPDATE matchE SET equipe1=0,
-    equipe2=0,
-    EGagner=0;
-    ";
-    $bdd->query($sqlUpdateMatch);
-
-
-
-    // ajout des groupes a la base 
-    $sqlA = 'INSERT INTO GroupeA(teteDeSerieA1,teteDeSerieA2,teteDeSerieA3,teteDeSerieA4) VALUES(?,?,?,?)';
-    $sqlB = 'INSERT INTO GroupeB(teteDeSerieB1,teteDeSerieB2,teteDeSerieB3,teteDeSerieB4) VALUES(?,?,?,?)';
-
-    $bdd->prepare($sqlA)->execute([$teteDeSerieA1, $teteDeSerieA2, $teteDeSerieA3, $teteDeSerieA4]);
-    $bdd->prepare($sqlB)->execute([$teteDeSerieB1, $teteDeSerieB2, $teteDeSerieB3, $teteDeSerieB4]);
-
-    header('Location:presentation.php');
-}
-//Creationn du classement du groupe A
-$bdd->query('DELETE FROM ClassementA');
-$sqlClA = "INSERT INTO ClassementA SELECT * FROM EQUIPE
-WHERE nomEquipe IN('$myResult1->teteDeSerieA1','$myResult1->teteDeSerieA2','$myResult1->teteDeSerieA3','$myResult1->teteDeSerieA4') ORDER BY POINT DESC";
-$bdd->query($sqlClA);
-
-
-
-// selection a la base pour le classement du groupe A
-$resultCA2 = $bdd->query("SELECT * FROM ClassementA LIMIT 2,2")->fetchAll();
-$resultCA1 = $bdd->query("SELECT * FROM ClassementA LIMIT 2")->fetchAll();
-
-function verifyMatch($equipe1, $equipe2)
-{
-
-    $bdd = loadDb();
-    $sqlEG = "SELECT EGagner from matchE where equipe1='$equipe1' AND equipe2='$equipe2'";
-    $result = $bdd->query($sqlEG);
-    if ($myResult = $result->fetchObject()) { //verification si il y a un match
-        return $myResult->EGagner; //retour de l'id de l'equipe gagnante
-    }
-    return null; //sinon il retourne null
-}
-
-
-
-// Verification pour les deux premiers du classement (1er et 2eme)
-if ($resultCA1[0]['point'] == $resultCA1[1]['point']) {
-    $bdd = loadDb();
-    $equipeGagner = verifyMatch($resultCA1[0]['id'], $resultCA1[1]['id']);
-    if ($equipeGagner == $resultCA1[1]['id']) { //verification si l'equipe gagnante est deuxieme
-        $temp = $resultCA1[0];
-        $resultCA1[0] = $resultCA1[1];
-        $resultCA1[1] = $temp;
-    }
-    // Verification en cas d'egalite de score
-    if ($equipeGagner == 0) {
-        if ($resultCA1[1]['butPour'] > $resultCA1[0]['butPour']) { //verification si l'equipe gagnante est deuxieme
-            $temp = $resultCA1[0];
-            $resultCA1[0] = $resultCA1[1];
-            $resultCA1[1] = $temp;
-        }
-
-         // Verification si les butPour des deux premiers equipes (1er et 2eme) sont egaux
-         if ($resultCA1[1]['butPour'] == $resultCA1[0]['butPour']) {
-            if ($resultCA1[1]['butContre'] < $resultCA1[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
-                $temp = $resultCA1[0];
-                $resultCA1[0] = $resultCA1[1];
-                $resultCA1[1] = $temp;
-            }
-        }
-    }
-}
-
-//Verification pour les deux derniers du classement (3eme et 4eme)
-
-if ($resultCA2[0]['point'] == $resultCA2[1]['point']) {
-    $bdd = loadDb();
-    $equipeGagner = verifyMatch($resultCA2[0]['id'], $resultCA2[1]['id']);
-    if ($equipeGagner == $resultCA2[1]['id']) { //verification si l'equipe gagnante est quatrieme
-        $temp = $resultCA2[0];
-        $resultCA2[0] = $resultCA2[1];
-        $resultCA2[1] = $temp;
-    }
-
-    if ($equipeGagner == 0) {
-        if ($resultCA2[1]['butPour'] > $resultCA2[0]['butPour']) { //verification si l'equipe gagnante est quatrieme
-            $temp = $resultCA2[0];
-            $resultCA2[0] = $resultCA2[1];
-            $resultCA2[1] = $temp;
-        }
-         // Verification si les butPour des deux premiers equipes (1er et 2eme) sont egaux
-         if ($resultCA2[1]['butPour'] == $resultCA2[0]['butPour']) {
-            if ($resultCA2[1]['butContre'] < $resultCA2[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
-                $temp = $resultCA2[0];
-                $resultCA2[0] = $resultCA2[1];
-                $resultCA2[1] = $temp;
-            }
-        }
-    }
-}
-
-
-
-
-//Creation du classement du groupe B
-$bdd->query('DELETE FROM ClassementB');
-$sqlClB = "INSERT INTO ClassementB SELECT * FROM EQUIPE
-WHERE nomEquipe IN('$myResult2->teteDeSerieB1','$myResult2->teteDeSerieB2','$myResult2->teteDeSerieB3','$myResult2->teteDeSerieB4') ORDER BY POINT DESC 
-";
-$bdd->query($sqlClB);
-
-// selection a la base pour le classement du groupe B
-$sqlClassementB = "
-SELECT * FROM ClassementB ";
-$resultCB = $bdd->query($sqlClassementB);
-
-
-//selection a la base pour le classement du groupe B
-$resultCB2 = $bdd->query("SELECT * FROM ClassementB LIMIT 2,2")->fetchAll();
-$resultCB1 = $bdd->query("SELECT * FROM ClassementB LIMIT 2")->fetchAll();
-
-
-
-// Verification pour les deux premiers du classement B (1er et 2eme)
-if ($resultCB1[0]['point'] == $resultCB1[1]['point']) {
-    $bdd = loadDb();
-    $equipeGagner = verifyMatch($resultCB1[0]['id'], $resultCB1[1]['id']);
-    if ($equipeGagner == $resultCB1[1]['id']) { //verification si l'equipe gagnante est deuxieme
-        $temp = $resultCB1[0];
-        $resultCB1[0] = $resultCB1[1];
-        $resultCB1[1] = $temp;
-    }
-    // Verification en cas d'egalite de score
-    if ($equipeGagner == 0) {
-        if ($resultCB1[1]['butPour'] > $resultCB1[0]['butPour']) { //verification si l'equipe gagnante est deuxieme
-            $temp = $resultCB1[0];
-            $resultCB1[0] = $resultCB1[1];
-            $resultCB1[1] = $temp;
-        }
-
-        // Verification si les butPour des deux premiers equipes (1er et 2eme) sont egaux
-        if ($resultCB1[1]['butPour'] == $resultCB1[0]['butPour']) {
-            if ($resultCB1[1]['butContre'] < $resultCB1[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
-                $temp = $resultCB1[0];
-                $resultCB1[0] = $resultCB1[1];
-                $resultCB1[1] = $temp;
-            }
-        }
-    }
-}
-
-//Verification pour les deux derniers du classement (3eme et 4eme)
-
-if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
-    $bdd = loadDb();
-    $equipeGagner = verifyMatch($resultCB2[0]['id'], $resultCB2[1]['id']);
-    if ($equipeGagner == $resultCB2[1]['id']) { //verification si l'equipe gagnante est quatrieme
-        $temp = $resultCB2[0];
-        $resultCB2[0] = $resultCB2[1];
-        $resultCB2[1] = $temp;
-    }
-
-    if ($equipeGagner == 0) {
-        if ($resultCB2[1]['butPour'] > $resultCB2[0]['butPour']) { //verification si l'equipe gagnante est quatrieme
-            $temp = $resultCB2[0];
-            $resultCB2[0] = $resultCB2[1];
-            $resultCB2[1] = $temp;
-        }
-
-        // Verification si les butPour des deux derniers equipes (3eme et 4eme) sont egaux
-        if ($resultCB2[1]['butPour'] == $resultCB2[0]['butPour']) {
-            if ($resultCB2[1]['butContre'] < $resultCB2[0]['butContre']) { //si c'est le cas on tiendra compte de l'equipe qui aura encaisse le moins de but
-                $temp = $resultCB2[0];
-                $resultCB2[0] = $resultCB2[1];
-                $resultCB2[1] = $temp;
-            }
-        }
-    }
-}
-
-
-
-
-
+    require './main.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -286,12 +9,8 @@ if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vue</title>
     <link rel="stylesheet" href="./presentation.css">
-
-    <style>
-
-    </style>
+    <title>Vue</title>
 </head>
 
 <body>
@@ -330,10 +49,11 @@ if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
                 </tr>
             </table>
 
-            <button type="submit" name="tirage">Tirage</button>
+            <button type="submit" class="btn_tirage" name="tirage">Tirage</button>
         </form>
 
-
+    </section>
+    <section class="<?= isset($_GET['tirage'])?'display_validation':'content'?>">
         <h2>Les Groupes</h2>
         <hr>
 
@@ -567,7 +287,7 @@ if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
                     <td>MJ</td>
                     <td>MG</td>
                     <td>MN</td>
-                    <td>MP<MP /td>
+                    <td>MP</td>
                     <td>BP</td>
                     <td>BC</td>
                     <td>Dif</td>
@@ -677,21 +397,36 @@ if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
                         <th></th>
                     </tr>
 
+                    <p><?= isset($_SESSION['equipeGagnante']) ? $_SESSION['equipeGagnante'] : '' ?></p>
                     <tr>
                         <td>Match 13</td>
-                        <td>1eA VS 2eB</td>
-                        <form action="" method="post">
-                            <td><input type="number" name="score" min=0 max=5 class="score"> vs <input type="number" name="score" min=0 max=5 class="score"></td>
-                            <td><button type="submit">Jouer</button></td>
+                        <td><?= $resultCA1[0]['nomEquipe'] . ' VS ' . $resultCB1[1]['nomEquipe'] ?></td>
+                        <form action="
+                                <?=
+                                '../Controleur/traitementMatch.php?equipe1=' . $resultCA1[0]['nomEquipe'] . '&equipe2=' . $resultCB1[1]['nomEquipe']
+                                ?>
+                                " method="post">
+                            <td>
+                                <input type="number" name="score25" min=0 max=5 class="score" <?php if (isset($_SESSION['match13']) && $_SESSION['match13']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score25'])) echo $_SESSION['score25']; ?>">
+                                vs <input type="number" name="score26" min=0 max=5 class="score" <?php if (isset($_SESSION['match13']) && $_SESSION['match13']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score26'])) echo $_SESSION['score26']; ?>">
+                            </td>
+                            <td><button type="submit" name="match" value="match13" <?php if (isset($_SESSION['match13']) && $_SESSION['match13']) echo 'disabled'; ?>>Jouer</button></td>
                         </form>
                     </tr>
 
                     <tr>
                         <td>Match 14</td>
-                        <td>1eB VS 2eA</td>
-                        <form action="" method="post">
-                            <td><input type="number" name="score" min=0 max=5 class="score"> vs <input type="number" name="score" min=0 max=5 class="score"></td>
-                            <td><button type="submit">Jouer</button></td>
+                        <td><?= $resultCB1[0]['nomEquipe'] . ' VS ' . $resultCA1[1]['nomEquipe'] ?></td>
+                        <form action="
+                                <?=
+                                '../Controleur/traitementMatch.php?equipe1=' . $resultCB1[0]['nomEquipe'] . '&equipe2=' . $resultCA1[1]['nomEquipe']
+                                ?>
+                                " method="post">
+                            <td>
+                                <input type="number" name="score27" min=0 max=5 class="score" <?php if (isset($_SESSION['match14']) && $_SESSION['match14']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score27'])) echo $_SESSION['score27']; ?>">
+                                vs <input type="number" name="score28" min=0 max=5 class="score" <?php if (isset($_SESSION['match14']) && $_SESSION['match14']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score28'])) echo $_SESSION['score28']; ?>">
+                            </td>
+                            <td><button type="submit" name="match" value="match14" <?php if (isset($_SESSION['match14']) && $_SESSION['match14']) echo 'disabled'; ?>>Jouer</button></td>
                         </form>
                     </tr>
                 </table>
@@ -707,13 +442,18 @@ if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
                     </tr>
 
                     <tr>
-                        <td>Match 15</td>
-                        <td>P13 VS P14</td>
-                        <form action="" method="post">
-                            <td><input type="number" name="score" min=0 max=5 class="score"> vs <input type="number" name="score" min=0 max=5 class="score"></td>
-                            <td><button type="submit">Jouer</button></td>
+
+                        <td>Match15</td>
+                        <td><?= isset($resultDemi->equipePerdante) ? $resultDemi->equipePerdante : '---' ?> VS <?= isset($resultDemi1->equipePerdante) ? $resultDemi1->equipePerdante : '---' ?></td>
+                        <form action="../Controleur/traitementMatch.php" method="post">
+                            <td>
+                                <input type="number" name="score29" min=0 max=5 class="score" <?php if (isset($_SESSION['match15']) && $_SESSION['match15']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score29'])) echo $_SESSION['score29']; ?>">
+                                vs <input type="number" name="score30" min=0 max=5 class="score" <?php if (isset($_SESSION['match15']) && $_SESSION['match15']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score30'])) echo $_SESSION['score30']; ?>">
+                            </td>
+                            <td><button type="submit" name="match" value="match15" <?php if (isset($_SESSION['match15']) && $_SESSION['match15']) echo 'disabled'; ?>>Jouer</button></td>
                         </form>
                     </tr>
+                    <p>Gagnant : <?= isset($resultDemi2->equipeGagnante) ? $resultDemi2->equipeGagnante : '---' ?></p>
                 </table>
 
                 <!-- GRANDE FINALE -->
@@ -731,12 +471,16 @@ if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
 
                     <tr>
                         <td>Match 16</td>
-                        <td>V13 VS V14</td>
-                        <form action="" method="post">
-                            <td><input type="number" name="score" min=0 max=5 class="score"> vs <input type="number" name="score" min=0 max=5 class="score"></td>
-                            <td><button type="submit">Jouer</button></td>
+                        <td><?= isset($resultDemi->equipeGagnante) ? $resultDemi->equipeGagnante : '---' ?> VS <?= isset($resultDemi1->equipeGagnante) ? $resultDemi1->equipeGagnante : '---' ?></td>
+                        <form action="../Controleur/traitementMatch.php" method="post">
+                            <td>
+                                <input type="number" name="score31" min=0 max=5 class="score" <?php if (isset($_SESSION['match16']) && $_SESSION['match16']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score31'])) echo $_SESSION['score31']; ?>">
+                                vs <input type="number" name="score32" min=0 max=5 class="score" <?php if (isset($_SESSION['match16']) && $_SESSION['match16']) echo 'disabled'; ?> value="<?php if (isset($_SESSION['score32'])) echo $_SESSION['score32']; ?>">
+                            </td>
+                            <td><button type="submit" name="match" value="match16" <?php if (isset($_SESSION['match16']) && $_SESSION['match16']) echo 'disabled'; ?>>Jouer</button></td>
                         </form>
                     </tr>
+                    <p>Gagnant : <?= isset($resultDemi3->equipeGagnante) ? $resultDemi3->equipeGagnante : '---' ?></p>
                 </table>
         </section>
 

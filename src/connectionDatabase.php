@@ -1,7 +1,7 @@
 <!-- Connexion a la base de donnees de MySQL -->
 <?php
 
-function loadDb(): PDO
+function loadDb()
 {
     try {
         $user = 'root';
@@ -12,5 +12,6 @@ function loadDb(): PDO
         return $conn;
     } catch (Exception $e) {
         echo $e->getMessage();
+        return false;
     }
 }
