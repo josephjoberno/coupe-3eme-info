@@ -1,0 +1,196 @@
+/* tablet */
+
+@media (max-width:1200px) {
+    .side_bar {
+        width: 220px;
+    }
+    .header i {
+        font-size: 25px;
+        cursor: pointer;
+        color: #fff;
+    }
+    .side_bar ul li {
+        display: flex;
+        align-items: flex-end;
+        padding: 10px 10px;
+        padding-left: 20px;
+    }
+    .side_bar ul li a {
+        font-size: 15px;
+    }
+    #navbtn {
+        margin-left: 30px;
+    }
+    #checkbox:checked~.body .side_bar {
+        width: 60px;
+    }
+    /* ----  les tableaux ---- */
+    table {
+        min-width: 98%;
+    }
+    th,
+    td {
+        padding: 8px;
+    }
+    table td img {
+        width: 20px;
+    }
+    .table.affiche1 {
+        position: absolute;
+        left: 50%;
+        top: 10%;
+    }
+    table.affiche2 {
+        position: absolute;
+        left: 50%;
+        top: 60%;
+    }
+    /* match par groupe */
+    table.affiche1 {
+        position: absolute;
+        left: 50%;
+        top: 25%;
+    }
+    table.affiche2 {
+        position: absolute;
+        left: 50%;
+        top: 65%;
+    }
+    /* Tirage */
+    table.tirage_tabl1 {
+        position: absolute;
+        left: 50%;
+        top: 20%;
+    }
+    button.btn_tirage {
+        position: absolute;
+        left: 50%;
+        top: 40%;
+    }
+    .tablegroupes {
+        position: absolute;
+        left: 50%;
+        top: 65%;
+    }
+}
+
+
+/* mobile */
+
+
+/* Dashboard */
+
+@media(max-width:700px) {
+    .search {
+        display: none;
+    }
+    .u_name img {
+        display: none;
+    }
+    .u_name label {
+        color: black;
+    }
+    .u_name label {
+        position: absolute;
+        left: -5%;
+    }
+    .user_active {
+        color: rgb(130, 144, 167);
+        font-size: 11px;
+    }
+    .header {
+        background: #0a1533;
+        position: sticky;
+        z-index: 1000;
+        top: 0;
+        padding: 12px;
+    }
+}
+
+
+/* Hamberger */
+
+@media(max-width:500px) {
+    .side_bar {
+        position: sticky;
+        z-index: 100;
+        top: 0;
+        width: 53px;
+        text-align: center;
+        background: #0a1533;
+        height: 100vh;
+    }
+    #checkbox:checked~.body .side_bar {
+        min-width: 800px;
+        transition: all .5s ease-in-out;
+    }
+    #checkbox:checked~.body .side_bar .user_p {
+        visibility: visible;
+    }
+    #checkbox:checked~.body .side_bar a span {
+        visibility: visible;
+        transition: all .3s ease-in-out;
+    }
+    #checkbox:checked~.body .side_bar .user_p img {
+        transition: all .2s ease-in-out;
+        background-color: rgb(255, 255, 255);
+    }
+    .user_p img {
+        position: relative;
+        right: 35%;
+        background: none;
+    }
+}
+
+
+/* tableaux  */
+
+@media(max-width:780px) {
+    table {
+        width: 95%;
+    }
+    th,
+    td {
+        position: sticky;
+        z-index: 0;
+        top: 0;
+        padding: 3px;
+    }
+    .table.affiche1 {
+        position: absolute;
+        left: 50%;
+        top: 10%;
+    }
+    #header th {
+        font-size: 12px;
+    }
+    button.btn_tirage {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+    }
+    .tablegroupes {
+        position: absolute;
+        left: 50%;
+        top: 85%;
+    }
+    /* matchgroupe */
+    table.affiche1 {
+        padding: 1px;
+        position: absolute;
+        top: 35%;
+        padding: 1px;
+    }
+    table.affiche2 {
+        position: relative;
+        top: 100%;
+    }
+    th,
+    td {
+        padding: 1px;
+    }
+    tr,
+    td {
+        padding: 1px;
+    }
+}

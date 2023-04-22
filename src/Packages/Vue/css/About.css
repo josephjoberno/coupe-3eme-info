@@ -1,0 +1,109 @@
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: rgb(157, 166, 196);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(57, 70, 112);
+    border-radius: 7px;
+}
+
+body {
+    background-color: rgb(236, 235, 235);
+}
+
+nav {
+    width: auto;
+    height: 100vh;
+}
+
+section {
+    font-family: 'Century Gothic';
+    width: 100%;
+    background-color: rgb(57, 70, 112);
+}
+
+section>div {
+    padding: 2%;
+}
+
+section>div h3 {
+    color: rgb(14, 14, 65);
+    padding: 5px;
+}
+
+section>div p {
+    color: rgb(39, 39, 102);
+}
+
+section h1 {
+    padding: 12px 10px;
+    font-size: 35px;
+    color: rgb(192, 201, 226);
+}
+
+.text {
+    width: 65%;
+    margin: 10%;
+    height: auto;
+    text-align: justify;
+}
+
+.text h1 {
+    color: rgb(132, 147, 190);
+    font-weight: 500;
+}
+
+.text p {
+    color: rgb(77, 77, 82);
+}
+
+.container-1 {
+    display: flex;
+    justify-content: space-evenly;
+    background-color: rgb(164, 173, 199);
+}
+
+.container-2 {
+    display: flex;
+    justify-content: space-evenly;
+    background-color: rgb(209, 217, 240);
+}
+
+.container-2 h3 {
+    text-align: right;
+}
+
+.container-3 {
+    display: flex;
+    justify-content: space-evenly;
+    background-color: rgb(164, 173, 199);
+}
+
+.container-1 img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid rgb(28, 76, 121);
+}
+
+.container-2 img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid rgb(28, 76, 121);
+}
+
+.container-3 img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid rgb(28, 76, 121);
+}
+
+border: 5px solid rgb(28, 76, 121);
+
+}
