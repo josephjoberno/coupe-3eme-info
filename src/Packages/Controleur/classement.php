@@ -1,5 +1,5 @@
 <?php
-require_once '../../connectionDatabase.php';
+require_once '../Vue/connect.php';
 
 $bdd=loadDb();
 
@@ -39,10 +39,10 @@ $resultCA1 = $bdd->query("SELECT * FROM ClassementA LIMIT 2")->fetchAll();
 
 // Verification pour les deux premiers du classement (1er et 2eme)
 if ($resultCA1[0]['point'] == $resultCA1[1]['point']) {
-    $bdd = loadDb();
+    // $bdd = loadDb();
     $equipeGagner = verifyMatch($resultCA1[0]['id'], $resultCA1[1]['id']);
     if ($equipeGagner == $resultCA1[1]['id']) { //verification si l'equipe gagnante est deuxieme
-        $temp = $resultCA1[0];
+         $temp = $resultCA1[0];
         $resultCA1[0] = $resultCA1[1];
         $resultCA1[1] = $temp;
     }
@@ -67,7 +67,7 @@ if ($resultCA1[0]['point'] == $resultCA1[1]['point']) {
 
 //Verification pour les deux derniers du classement (3eme et 4eme)
 if ($resultCA2[0]['point'] == $resultCA2[1]['point']) {
-    $bdd = loadDb();
+    // $bdd = loadDb();
     $equipeGagner = verifyMatch($resultCA2[0]['id'], $resultCA2[1]['id']);
     if ($equipeGagner == $resultCA2[1]['id']) { //verification si l'equipe gagnante est quatrieme
         $temp = $resultCA2[0];
@@ -92,7 +92,7 @@ if ($resultCA2[0]['point'] == $resultCA2[1]['point']) {
     }
 }
 
-
+// Verification pour les 2eme et 3eme du classement 
 
 
 //Creation du classement du groupe B
@@ -108,7 +108,7 @@ $resultCB1 = $bdd->query("SELECT * FROM ClassementB LIMIT 2")->fetchAll();
 
 // Verification pour les deux premiers du classement B (1er et 2eme)
 if ($resultCB1[0]['point'] == $resultCB1[1]['point']) {
-    $bdd = loadDb();
+    // $bdd = loadDb();
     $equipeGagner = verifyMatch($resultCB1[0]['id'], $resultCB1[1]['id']);
     if ($equipeGagner == $resultCB1[1]['id']) { //verification si l'equipe gagnante est deuxieme
         $temp = $resultCB1[0];
@@ -136,7 +136,7 @@ if ($resultCB1[0]['point'] == $resultCB1[1]['point']) {
 
 //Verification pour les deux derniers du classement (3eme et 4eme)
 if ($resultCB2[0]['point'] == $resultCB2[1]['point']) {
-    $bdd = loadDb();
+    // $bdd = loadDb();
     $equipeGagner = verifyMatch($resultCB2[0]['id'], $resultCB2[1]['id']);
     if ($equipeGagner == $resultCB2[1]['id']) { //verification si l'equipe gagnante est quatrieme
         $temp = $resultCB2[0];

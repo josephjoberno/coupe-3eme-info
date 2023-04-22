@@ -10,15 +10,16 @@ table th {
 table td {
     background: rgba(255, 254, 254, 0.637);
     text-align: center;
+}
 
+p {
+    color: #1077dd;
 }
-p{
-    color:#1077dd;
-}
-.content{
+
+.content {
     display: none;
 }
-.add_validation{
+
+.add_validation {
     display: block;
 }
-
