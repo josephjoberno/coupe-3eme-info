@@ -23,3 +23,25 @@ Ce projet a été réalisé avec la participation des contributeurs suivants :
 - @dadensky
 - @birladotech
 - @victorchristan
+
+## Screenshots
+----
+
+### Accueil
+![App  Screenshot](https://github.com/birladotech/coupe-3eme-info/blob/main/SCR-20230422-eiu.png)
+----
+
+### Tirage
+![App  Screenshot](https://github.com/birladotech/coupe-3eme-info/blob/main/SCR-20230422-eea.png)
+----
+
+### Match
+![App  Screenshot](https://github.com/birladotech/coupe-3eme-info/blob/main/SCR-20230422-eev.png)
+-----
+
+### Classement
+![App  Screenshot](https://github.com/birladotech/coupe-3eme-info/blob/main/SCR-20230422-ef5.png)
+
+
+
+
